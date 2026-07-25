@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diário de Estudos</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#E8590C">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F7F6F3;
+    --bg-soft:#F0EEE9;
+    --card:#FFFFFF;
+    --border:#EAE6DF;
+    --text:#2A251E;
+    --text-muted:#8A8074;
+    --text-faint:#B7AE9F;
+    --shadow:0 10px 30px -14px rgba(60,40,10,0.16);
+    --shadow-sm:0 4px 14px -8px rgba(60,40,10,0.10);
+
+    --accent:#E8590C;
+    --accent-soft:#FFE3CC;
+    --ok:#3FBF7F;
+    --warn:#EFBE2F;
+    --late:#EF6F6F;
+
+    --heat-0:#EDEAE4;
+    --heat-1:#FFE1A8;
+    --heat-2:#FFB25E;
+    --heat-3:#F17A34;
+    --heat-4:#D6420E;
+
+    --radius-xl:22px;
+    --radius-lg:16px;
+    --radius-md:12px;
+    --radius-sm:9px;
+
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);color:var(--text);font-family:var(--font-body);
+    min-height:100vh;-webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;cursor:pointer;}
+  input,textarea{font-family:inherit;}
+  .hidden{display:none !important;}
+  .wrap{max-width:1080px;margin:0 auto;padding:26px 20px 90px;}
+
+  /* connect screen */
+  #connectScreen{max-width:480px;margin:12vh auto;padding:0 20px;}
+  .connect-card{background:var(--card);border-radius:var(--radius-xl);padding:32px;box-shadow:var(--shadow);text-align:center;}
+  .connect-card .spin img{border-radius:14px;}
+  .connect-card h1{font-family:var(--font-display);font-size:20px;margin:14px 0 8px;}
+  .connect-card p{color:var(--text-muted);font-size:13.5px;margin:0;line-height:1.6;}
+  .mini-btn{background:#fff;border:1px solid var(--border);color:var(--text-muted);font-size:11.5px;padding:7px 12px;border-radius:var(--radius-sm);white-space:nowrap;}
+  .mini-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  header.top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:14px;}
+  .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+  header.top h1{font-family:var(--font-display);font-size:26px;font-weight:700;margin:0 0 4px;}
+  header.top p{margin:0;color:var(--text-muted);font-size:13.5px;}
+  .top-actions{display:flex;align-items:center;gap:10px;}
+  .icon-btn{width:38px;height:38px;border-radius:11px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--text-muted);box-shadow:var(--shadow-sm);}
+
+  .chip-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+  .chip{background:var(--card);border:1px solid var(--border);border-radius:100px;padding:9px 16px;font-size:12.5px;color:var(--text-muted);display:flex;align-items:center;gap:7px;box-shadow:var(--shadow-sm);}
+  .chip b{color:var(--text);font-family:var(--font-mono);}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);padding:22px;box-shadow:var(--shadow-sm);margin-bottom:18px;}
+  .card-title{font-family:var(--font-mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-faint);margin-bottom:14px;}
+  .section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+  .section-head h2{font-family:var(--font-display);font-size:17px;margin:0;}
+  .section-head .sub{font-size:12px;color:var(--text-faint);}
+
+  /* heatmap grande */
+  .heatmap-card{padding:24px 22px 20px;}
+  .heatmap-scroll{overflow-x:auto;padding-bottom:8px;}
+  .heatmap-inner{display:inline-block;}
+  .heatmap-months{display:grid;grid-auto-flow:column;grid-auto-columns:16px;gap:4px;margin-left:30px;margin-bottom:4px;height:14px;}
+  .heatmap-months span{font-size:10.5px;color:var(--text-faint);font-family:var(--font-mono);}
+  .heatmap-body{display:flex;gap:4px;}
+  .heatmap-daylabels{display:grid;grid-template-rows:repeat(7,16px);gap:4px;width:26px;}
+  .heatmap-daylabels span{font-size:9.5px;color:var(--text-faint);font-family:var(--font-mono);align-self:center;}
+  .heatmap-grid{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,16px);gap:4px;}
+  .heat-cell{width:16px;height:16px;border-radius:4px;background:var(--heat-0);cursor:pointer;transition:transform .1s;}
+  .heat-cell:hover{transform:scale(1.25);}
+  .heat-cell.level-1{background:var(--heat-1);}
+  .heat-cell.level-2{background:var(--heat-2);}
+  .heat-cell.level-3{background:var(--heat-3);}
+  .heat-cell.level-4{background:var(--heat-4);}
+  .heat-cell.today-ring{box-shadow:0 0 0 2px var(--text);}
+  .heat-cell.selected-ring{box-shadow:0 0 0 2px var(--accent);}
+  .heatmap-legend{display:flex;align-items:center;gap:6px;margin-top:14px;font-size:11px;color:var(--text-faint);}
+  .heatmap-legend .heat-cell{cursor:default;width:14px;height:14px;}
+  .heatmap-legend .heat-cell:hover{transform:none;}
+
+  /* dia selecionado / nota */
+  .day-panel-title{font-family:var(--font-display);font-size:16px;margin:0 0 3px;}
+  .day-panel-sub{font-size:12px;color:var(--text-faint);margin-bottom:14px;}
+  textarea{
+    width:100%;min-height:110px;padding:12px 14px;border-radius:var(--radius-md);border:1px solid var(--border);
+    background:var(--bg-soft);color:var(--text);font-size:13.5px;font-family:var(--font-body);resize:vertical;line-height:1.6;
+  }
+  textarea:focus{outline:none;border-color:var(--accent);}
+  .day-actions{display:flex;gap:8px;margin-top:10px;align-items:center;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border-radius:var(--radius-sm);border:none;font-weight:600;font-size:13.5px;}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-secondary{background:var(--bg-soft);color:var(--text);}
+  .btn-danger{background:#fff;border:1px solid var(--late);color:var(--late);}
+  .save-status{font-size:11.5px;color:var(--text-faint);font-family:var(--font-mono);}
+
+  /* temas de revisao */
+  .add-tema-row{display:flex;gap:8px;margin-bottom:16px;}
+  .add-tema-row input{flex:1;padding:11px 13px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-soft);color:var(--text);font-size:13.5px;}
+  .add-tema-row input:focus{outline:none;border-color:var(--accent);}
+  .tema-list{display:flex;flex-direction:column;gap:8px;}
+  .tema-empty{color:var(--text-faint);font-size:13px;padding:6px 0;}
+  .tema-row{display:flex;align-items:center;gap:12px;padding:11px 13px;background:var(--bg-soft);border-radius:var(--radius-md);flex-wrap:wrap;}
+  .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .tema-row .name{flex:1;font-size:13.5px;min-width:120px;}
+  .tema-row .name small{display:block;color:var(--text-faint);font-size:10.5px;margin-top:1px;font-family:var(--font-mono);}
+  .badge-time{font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:100px;white-space:nowrap;}
+  .badge-time.late{background:rgba(239,111,111,0.15);color:#C74848;}
+  .badge-time.soon{background:rgba(239,190,47,0.18);color:#A9820C;}
+  .badge-time.upcoming{background:var(--bg-soft);border:1px solid var(--border);color:var(--text-muted);}
+  .badge-time.mature{background:rgba(63,191,127,0.15);color:#1F8E56;}
+  .review-prompt{display:flex;gap:5px;align-items:center;}
+  .diff-btn{padding:6px 9px;font-size:13px;}
+  .diff-btn.hard{border-color:var(--late);}
+  .diff-btn.easy{border-color:var(--ok);}
+  .diff-btn.skip{color:var(--text-faint);}
+  .tema-del{background:none;border:none;color:var(--text-faint);font-size:15px;padding:2px 4px;}
+  .tema-del:hover{color:var(--late);}
+
+  /* modal settings */
+  .modal-overlay{position:fixed;inset:0;background:rgba(40,25,10,0.35);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px;}
+  .modal{background:var(--card);border-radius:var(--radius-xl);padding:28px;max-width:480px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow);}
+  .modal h2{font-family:var(--font-display);font-size:19px;margin:0 0 4px;}
+  .modal .desc{font-size:12.5px;color:var(--text-muted);margin:0 0 18px;line-height:1.6;}
+  .modal-section-title{font-size:11px;font-family:var(--font-mono);letter-spacing:1px;text-transform:uppercase;color:var(--text-faint);margin:18px 0 10px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:11.5px;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-mono);}
+  .field input{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-soft);color:var(--text);font-size:13px;font-family:var(--font-mono);}
+  .field input:focus{outline:none;border-color:var(--accent);}
+  .field-hint{font-size:10.5px;color:var(--text-faint);margin-top:5px;line-height:1.5;}
+  .modal-status{font-size:12.5px;margin-top:10px;font-family:var(--font-mono);min-height:16px;}
+  .modal-status.err{color:var(--late);}
+  .modal-status.ok{color:var(--ok);}
+  .btn-block{width:100%;margin-top:8px;}
+
+  footer.foot{text-align:center;color:var(--text-faint);font-size:11px;margin-top:24px;font-family:var(--font-mono);}
+</style>
+</head>
+<body>
+
+<div id="connectScreen">
+  <div class="connect-card">
+    <div class="spin"><img src="./icon-192.png" width="46" height="46"></div>
+    <h1 id="connectTitle">Conectando...</h1>
+    <p id="connectMsg">Só um instante.</p>
+  </div>
+</div>
+
+<div class="wrap hidden" id="app">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Diário de Estudos</div>
+      <h1>Como foi hoje? 🔥</h1>
+      <p id="headerSub">Registre o dia e mantenha os temas em dia.</p>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="btnSettings" title="Configurações">⚙️</button>
+    </div>
+  </header>
+
+  <div class="chip-row" id="chipRow"></div>
+
+  <div class="card heatmap-card">
+    <div class="section-head">
+      <h2>Seu ano</h2>
+      <span class="sub" id="heatmapSub">clique num quadrado pra ver ou editar a nota daquele dia</span>
+    </div>
+    <div class="heatmap-scroll">
+      <div class="heatmap-inner">
+        <div class="heatmap-months" id="heatmapMonths"></div>
+        <div class="heatmap-body">
+          <div class="heatmap-daylabels"><span></span><span>seg</span><span></span><span>qua</span><span></span><span>sex</span><span></span></div>
+          <div class="heatmap-grid" id="heatmapGrid"></div>
+        </div>
+      </div>
+    </div>
+    <div class="heatmap-legend">menos
+      <span class="heat-cell level-0"></span>
+      <span class="heat-cell level-1"></span>
+      <span class="heat-cell level-2"></span>
+      <span class="heat-cell level-3"></span>
+      <span class="heat-cell level-4"></span>
+    mais</div>
+  </div>
+
+  <div class="card" id="dayPanel">
+    <div class="day-panel-title" id="dayPanelTitle">Hoje</div>
+    <div class="day-panel-sub" id="dayPanelSub"></div>
+    <textarea id="dayNoteInput" placeholder="O que você fez/estudou hoje? Como foi?"></textarea>
+    <div class="day-actions">
+      <button class="btn btn-primary" id="btnSaveNote">Salvar nota</button>
+      <span class="save-status" id="saveStatus"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-head">
+      <h2>🔁 Revisão espaçada</h2>
+      <span class="sub">adicione qualquer tema — a hora que quiser</span>
+    </div>
+    <div class="add-tema-row">
+      <input id="novoTemaInput" placeholder="Nome do tema (ex: Vetores, Verbo to be...)">
+      <button class="btn btn-primary" id="btnAddTema">+ Adicionar</button>
+    </div>
+    <div class="tema-list" id="temaList"></div>
+  </div>
+
+  <footer class="foot">dados sincronizados via Firebase</footer>
+</div>
+
+<div class="modal-overlay hidden" id="settingsModal">
+  <div class="modal">
+    <h2>Configurações</h2>
+    <p class="desc">A revisão espaçada é sempre baseada em quando você tocou no tema — nunca em datas fixas.</p>
+
+    <div class="modal-section-title">Conexão</div>
+    <div class="field">
+      <label>URL do Firebase (Realtime Database)</label>
+      <input id="inputUrl">
+      <div class="field-hint">Pode usar o mesmo Firebase do painel ITA — esse app guarda tudo numa gaveta separada (/diario), não mistura os dados.</div>
+    </div>
+
+    <div class="modal-section-title">Intervalos de revisão espaçada (dias)</div>
+    <div class="field">
+      <input id="inputIntervals" placeholder="3,7,16,35,90">
+    </div>
+
+    <div class="modal-section-title">Lembretes</div>
+    <div class="field">
+      <button class="btn btn-secondary btn-block" id="btnNotifPermission">🔔 Ativar lembretes de revisão</button>
+      <div class="field-hint" id="notifStatus">Avisa quando um tema estiver a 1 dia de vencer — só funciona com o app aberto/reaberto.</div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="btnSaveSettings">Salvar</button>
+    <button class="btn btn-danger btn-block" id="btnResetAll">Apagar todos os dados</button>
+    <div class="modal-status" id="settingsStatus"></div>
+    <button class="mini-btn" id="btnCloseSettings" style="margin-top:14px;">Fechar</button>
+  </div>
+</div>
+
+<script>
+/* ============ CONFIG ============ */
+const DEFAULT_URL = 'https://itaappgui-default-rtdb.firebaseio.com';
+let config = {
+  url: DEFAULT_URL,
+  intervals: [3,7,16,35,90]
+};
+let notas = {};       // { 'YYYY-MM-DD': 'texto' }
+let atividade = {};   // { 'YYYY-MM-DD': count }
+let temas = {};       // { temaId: {nome, criado_em, ultima_interacao, revisoes_qtd} }
+let selectedDate = todayKey();
+let pendingReviewPrompt = null;
+
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+function fmtDatePT(key){
+  const d = new Date(key+'T00:00:00');
+  return d.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'});
+}
+
+/* ============ STORAGE LOCAL (config + fallback offline) ============ */
+async function loadConfig(){
+  try{
+    const r = await window.storage.get('diario_config');
+    if(r && r.value){
+      const saved = JSON.parse(r.value);
+      config = Object.assign({}, config, saved);
+      config.intervals = (saved.intervals && saved.intervals.length) ? saved.intervals : config.intervals;
+    }
+  }catch(e){}
+}
+async function saveConfigLocal(){
+  try{ await window.storage.set('diario_config', JSON.stringify(config)); }catch(e){}
+}
+
+/* ============ FIREBASE (fetch simples — funciona bem com Realtime Database) ============ */
+async function fbGet(path){
+  let res;
+  try{ res = await fetch(config.url + path + '.json'); }
+  catch(networkErr){ throw new Error('Falha de rede ao contactar o Firebase: '+networkErr.message); }
+  if(!res.ok) throw new Error('Firebase respondeu status HTTP '+res.status);
+  return await res.json();
+}
+async function fbPut(path, data){
+  let res;
+  try{
+    res = await fetch(config.url + path + '.json', {
+      method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)
+    });
+  }catch(networkErr){ throw new Error('Falha de rede ao salvar no Firebase: '+networkErr.message); }
+  if(!res.ok) throw new Error('Firebase respondeu status HTTP '+res.status+' ao salvar — confira as Rules.');
+  return await res.json();
+}
+
+async function loadAll(){
+  const [n, a, t] = await Promise.all([
+    fbGet('/diario/notas'),
+    fbGet('/diario/atividade'),
+    fbGet('/diario/temas')
+  ]);
+  notas = n || {};
+  atividade = a || {};
+  temas = t || {};
+  try{
+    localStorage.setItem('diario_cache', JSON.stringify({notas, atividade, temas}));
+  }catch(e){}
+}
+async function logAtividade(dateKey){
+  atividade[dateKey] = (atividade[dateKey]||0) + 1;
+  try{ await fbPut('/diario/atividade/'+dateKey, atividade[dateKey]); }catch(e){}
+}
+
+/* ============ NOTAS DO DIA ============ */
+function showSaveStatus(msg, isErr){
+  const el = document.getElementById('saveStatus');
+  el.textContent = msg;
+  el.style.color = isErr ? 'var(--late)' : 'var(--text-faint)';
+  if(!isErr) setTimeout(()=>{ if(el.textContent===msg) el.textContent=''; }, 2500);
+}
+async function salvarNota(){
+  const texto = document.getElementById('dayNoteInput').value;
+  const isNew = !notas[selectedDate] && texto.trim();
+  notas[selectedDate] = texto;
+  showSaveStatus('Salvando...', false);
+  try{
+    await fbPut('/diario/notas/'+selectedDate, texto);
+    if(isNew) await logAtividade(selectedDate);
+    showSaveStatus('Salvo ✅', false);
+    renderHeatmap();
+    renderChips();
+  }catch(err){
+    showSaveStatus('Erro: '+err.message, true);
+  }
+}
+function selecionarDia(dateKey){
+  selectedDate = dateKey;
+  const isToday = dateKey === todayKey();
+  document.getElementById('dayPanelTitle').textContent = isToday ? 'Hoje' : fmtDatePT(dateKey);
+  document.getElementById('dayPanelSub').textContent = dateKey;
+  document.getElementById('dayNoteInput').value = notas[dateKey] || '';
+  document.getElementById('saveStatus').textContent = '';
+  renderHeatmap();
+  document.getElementById('dayPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+/* ============ HEATMAP GRANDE (ano inteiro) ============ */
+function renderHeatmap(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const weeksBack = 52;
+  const daysBack = weeksBack*7 + today.getDay();
+  const start = new Date(today.getTime() - daysBack*86400000);
+
+  const gridEl = document.getElementById('heatmapGrid');
+  const monthsEl = document.getElementById('heatmapMonths');
+  let gridHtml = '';
+  let monthsHtml = '';
+  let lastMonth = -1;
+  const totalCols = Math.ceil((daysBack+1)/7);
+
+  for(let i=0;i<=daysBack;i++){
+    const d = new Date(start.getTime() + i*86400000);
+    const key = d.toISOString().slice(0,10);
+    const count = atividade[key] || 0;
+    const level = count===0?0: count===1?1: count<=3?2: count<=5?3:4;
+    const col = Math.floor(i/7)+1;
+    const row = d.getDay()===0?7:d.getDay(); // segunda=1 ... domingo=7
+    const isToday = key===todayKey();
+    const isSelected = key===selectedDate;
+    const label = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    gridHtml += '<div class="heat-cell level-'+level+(isToday?' today-ring':'')+(isSelected?' selected-ring':'')+'" data-date="'+key+'" title="'+label+' — '+count+' registro(s)" style="grid-column:'+col+';grid-row:'+row+';"></div>';
+
+    if(d.getDate()===1 && d.getMonth()!==lastMonth){
+      lastMonth = d.getMonth();
+      const mname = d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
+      monthsHtml += '<span style="grid-column:'+col+'">'+mname+'</span>';
+    }
+  }
+  gridEl.innerHTML = gridHtml;
+  gridEl.style.gridTemplateColumns = 'repeat('+totalCols+',16px)';
+  monthsEl.innerHTML = monthsHtml;
+  monthsEl.style.gridTemplateColumns = 'repeat('+totalCols+',16px)';
+}
+
+/* ============ CHIPS ============ */
+function computeStreak(){
+  let streak = 0;
+  let d = new Date();
+  d.setHours(0,0,0,0);
+  // se hoje ainda nao tem nota, comeca a contar de ontem (nao quebra o streak antes do dia acabar)
+  if(!notas[todayKey()] || !notas[todayKey()].trim()){
+    d.setDate(d.getDate()-1);
+  }
+  while(true){
+    const key = d.toISOString().slice(0,10);
+    if(notas[key] && notas[key].trim()){
+      streak++;
+      d.setDate(d.getDate()-1);
+    } else break;
+  }
+  return streak;
+}
+function renderChips(){
+  const streak = computeStreak();
+  const totalNotas = Object.values(notas).filter(t=>t && t.trim()).length;
+  const dueCount = Object.keys(temas).filter(id=>{
+    const r = getReviewState(temas[id]);
+    return r.state==='atrasado' || r.state==='revisar_breve';
+  }).length;
+  document.getElementById('chipRow').innerHTML =
+    '<div class="chip">🔥 <b>'+streak+'</b> dias seguidos</div>'+
+    '<div class="chip">📝 <b>'+totalNotas+'</b> notas registradas</div>'+
+    '<div class="chip">🔁 <b>'+dueCount+'</b> temas pra revisar</div>';
+}
+
+/* ============ TEMAS DE REVISÃO ESPAÇADA (livres) ============ */
+function getReviewState(tema){
+  if(!tema || !tema.criado_em) return {state:'nao_iniciado'};
+  const reviewCount = tema.revisoes_qtd || 0;
+  const lastDate = new Date(tema.ultima_interacao || tema.criado_em);
+  const intervals = config.intervals;
+  const idx = Math.min(reviewCount, intervals.length-1);
+  const intervalDays = intervals[idx];
+  const dueDate = new Date(lastDate.getTime() + intervalDays*86400000);
+  const daysUntilDue = Math.floor((dueDate.getTime()-Date.now())/86400000);
+  let state;
+  if(reviewCount >= intervals.length && daysUntilDue>0) state='maturado';
+  else if(daysUntilDue<=0) state='atrasado';
+  else if(daysUntilDue<=2) state='revisar_breve';
+  else state='em_dia';
+  return {state, daysUntilDue};
+}
+function stateColor(s){
+  if(s==='atrasado') return 'var(--late)';
+  if(s==='revisar_breve') return 'var(--warn)';
+  if(s==='maturado') return 'var(--ok)';
+  if(s==='em_dia') return 'var(--accent)';
+  return 'var(--border)';
+}
+function reviewActionsHtml(id, tema){
+  if(pendingReviewPrompt === id){
+    return '<div class="review-prompt">'+
+      '<button class="mini-btn diff-btn hard" data-action="revisar-dificil" data-id="'+id+'" title="difícil">😖</button>'+
+      '<button class="mini-btn diff-btn skip" data-action="revisar-normal" data-id="'+id+'" title="normal">✕</button>'+
+      '<button class="mini-btn diff-btn easy" data-action="revisar-facil" data-id="'+id+'" title="fácil">😌</button>'+
+    '</div>';
+  }
+  return '<button class="mini-btn" data-action="revisar" data-id="'+id+'">+ revisão ('+(tema.revisoes_qtd||0)+')</button>';
+}
+function renderTemas(){
+  const el = document.getElementById('temaList');
+  const ids = Object.keys(temas).sort((a,b)=>{
+    const ra = getReviewState(temas[a]).daysUntilDue ?? 9999;
+    const rb = getReviewState(temas[b]).daysUntilDue ?? 9999;
+    return ra-rb;
+  });
+  if(ids.length===0){
+    el.innerHTML = '<div class="tema-empty">Nenhum tema cadastrado ainda. Adiciona um ali em cima quando estudar algo.</div>';
+    return;
+  }
+  el.innerHTML = ids.map(id=>{
+    const tema = temas[id];
+    const r = getReviewState(tema);
+    let cls, txt;
+    if(r.state==='atrasado'){ cls='late'; txt=Math.abs(r.daysUntilDue)+'d atrasado'; }
+    else if(r.state==='revisar_breve'){ cls='soon'; txt='vence em '+r.daysUntilDue+'d'; }
+    else if(r.state==='maturado'){ cls='mature'; txt='maturado'; }
+    else { cls='upcoming'; txt='vence em '+r.daysUntilDue+'d'; }
+    return '<div class="tema-row">'+
+      '<div class="dot" style="background:'+stateColor(r.state)+'"></div>'+
+      '<div class="name">'+tema.nome+'<small>criado '+new Date(tema.criado_em).toLocaleDateString('pt-BR')+'</small></div>'+
+      '<div class="badge-time '+cls+'">'+txt+'</div>'+
+      reviewActionsHtml(id, tema)+
+      '<button class="tema-del" data-action="del-tema" data-id="'+id+'" title="remover tema">✕</button>'+
+    '</div>';
+  }).join('');
+}
+async function addTema(){
+  const input = document.getElementById('novoTemaInput');
+  const nome = input.value.trim();
+  if(!nome) return;
+  const id = 't_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const now = new Date().toISOString();
+  temas[id] = {nome, criado_em:now, ultima_interacao:now, revisoes_qtd:0};
+  input.value='';
+  renderTemas(); renderChips();
+  try{ await fbPut('/diario/temas/'+id, temas[id]); await logAtividade(todayKey()); renderHeatmap(); }
+  catch(err){ showSaveStatus('Erro ao salvar tema: '+err.message, true); }
+}
+async function revisarComDificuldade(id, delta){
+  pendingReviewPrompt = null;
+  const tema = temas[id];
+  if(!tema) return;
+  tema.revisoes_qtd = Math.max(0, (tema.revisoes_qtd||0) + delta);
+  tema.ultima_interacao = new Date().toISOString();
+  renderTemas(); renderChips();
+  try{ await fbPut('/diario/temas/'+id, tema); await logAtividade(todayKey()); renderHeatmap(); }
+  catch(err){ showSaveStatus('Erro ao sincronizar: '+err.message, true); }
+}
+async function delTema(id){
+  if(!confirm('Remover "'+(temas[id]?temas[id].nome:'')+'" da lista de revisão?')) return;
+  delete temas[id];
+  renderTemas(); renderChips();
+  try{ await fbPut('/diario/temas/'+id, null); }catch(err){}
+}
+
+/* ============ EVENTOS ============ */
+document.addEventListener('click', (e)=>{
+  const cell = e.target.closest('.heat-cell[data-date]');
+  if(cell){ selecionarDia(cell.dataset.date); return; }
+
+  const btn = e.target.closest('[data-action]');
+  if(!btn){
+    if(pendingReviewPrompt){ pendingReviewPrompt = null; renderTemas(); }
+    return;
+  }
+  const action = btn.dataset.action;
+  const id = btn.dataset.id;
+  if(action==='revisar'){ pendingReviewPrompt = id; renderTemas(); }
+  else if(action==='revisar-dificil') revisarComDificuldade(id, -1);
+  else if(action==='revisar-normal') revisarComDificuldade(id, 1);
+  else if(action==='revisar-facil') revisarComDificuldade(id, 2);
+  else if(action==='del-tema') delTema(id);
+});
+document.getElementById('btnSaveNote').addEventListener('click', salvarNota);
+document.getElementById('btnAddTema').addEventListener('click', addTema);
+document.getElementById('novoTemaInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') addTema(); });
+
+/* ============ SETTINGS ============ */
+function openSettings(){
+  document.getElementById('inputUrl').value = config.url;
+  document.getElementById('inputIntervals').value = config.intervals.join(',');
+  document.getElementById('settingsStatus').textContent = '';
+  updateNotifStatus();
+  document.getElementById('settingsModal').classList.remove('hidden');
+}
+function closeSettings(){ document.getElementById('settingsModal').classList.add('hidden'); }
+document.getElementById('btnSettings').addEventListener('click', openSettings);
+document.getElementById('btnCloseSettings').addEventListener('click', closeSettings);
+
+document.getElementById('btnSaveSettings').addEventListener('click', async ()=>{
+  const status = document.getElementById('settingsStatus');
+  const newUrl = document.getElementById('inputUrl').value.trim();
+  const parsedIntervals = document.getElementById('inputIntervals').value.split(',').map(s=>Number(s.trim())).filter(n=>n>0);
+  config.url = newUrl || config.url;
+  config.intervals = parsedIntervals.length ? parsedIntervals : config.intervals;
+  status.className='modal-status'; status.textContent='Salvando...';
+  try{
+    await loadAll();
+    await saveConfigLocal();
+    status.className='modal-status ok'; status.textContent='Salvo!';
+    renderAll();
+    setTimeout(closeSettings, 500);
+  }catch(err){
+    status.className='modal-status err'; status.textContent='Erro: '+err.message;
+  }
+});
+
+document.getElementById('btnResetAll').addEventListener('click', async ()=>{
+  if(!confirm('Isso apaga TODAS as notas e temas salvos. Tem certeza?')) return;
+  const status = document.getElementById('settingsStatus');
+  status.textContent = 'Apagando...';
+  try{
+    await fbPut('/diario', {notas:null, atividade:null, temas:null});
+    notas={}; atividade={}; temas={};
+    status.className='modal-status ok'; status.textContent='Apagado.';
+    renderAll();
+  }catch(err){
+    status.className='modal-status err'; status.textContent='Erro: '+err.message;
+  }
+});
+
+/* ============ NOTIFICAÇÕES ============ */
+function updateNotifStatus(){
+  const el = document.getElementById('notifStatus');
+  const btn = document.getElementById('btnNotifPermission');
+  if(!('Notification' in window)){ el.textContent='Seu navegador não suporta notificações.'; btn.classList.add('hidden'); return; }
+  if(Notification.permission==='granted'){ el.textContent='Lembretes ativados ✅'; btn.textContent='🔔 Lembretes já ativados'; }
+  else if(Notification.permission==='denied'){ el.textContent='Notificações bloqueadas no navegador/celular.'; }
+}
+document.getElementById('btnNotifPermission').addEventListener('click', async ()=>{
+  if(!('Notification' in window)) return;
+  await Notification.requestPermission();
+  updateNotifStatus();
+  checkAndNotify();
+});
+function checkAndNotify(){
+  if(!('Notification' in window) || Notification.permission!=='granted') return;
+  const todayK = todayKey();
+  let notifiedLog = {};
+  try{ notifiedLog = JSON.parse(localStorage.getItem('diario_notified')||'{}'); }catch(e){}
+  Object.keys(temas).forEach(id=>{
+    const r = getReviewState(temas[id]);
+    if(r.state!=='revisar_breve' || r.daysUntilDue!==1) return;
+    const key = id+'_'+todayK;
+    if(notifiedLog[key]) return;
+    try{ new Notification('Revisão amanhã: '+temas[id].nome, {body:'Vence em 1 dia', icon:'./icon-192.png'}); }catch(e){}
+    notifiedLog[key] = true;
+  });
+  try{ localStorage.setItem('diario_notified', JSON.stringify(notifiedLog)); }catch(e){}
+}
+
+/* ============ RENDER GERAL ============ */
+function renderAll(){
+  renderChips();
+  renderHeatmap();
+  renderTemas();
+  const isToday = selectedDate === todayKey();
+  document.getElementById('dayPanelTitle').textContent = isToday ? 'Hoje' : fmtDatePT(selectedDate);
+  document.getElementById('dayPanelSub').textContent = selectedDate;
+  document.getElementById('dayNoteInput').value = notas[selectedDate] || '';
+}
+
+/* ============ AUTO-REFRESH ============ */
+let refreshing = false;
+async function refreshFromBackend(){
+  if(refreshing) return;
+  refreshing = true;
+  try{ await loadAll(); renderAll(); checkAndNotify(); }
+  catch(err){ showSaveStatus('Não sincronizou: '+err.message, true); }
+  finally{ refreshing = false; }
+}
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') refreshFromBackend(); });
+window.addEventListener('focus', refreshFromBackend);
+window.addEventListener('pageshow', (e)=>{ if(e.persisted) refreshFromBackend(); });
+
+/* ============ BOOT ============ */
+(async function boot(){
+  await loadConfig();
+  const connectTitle = document.getElementById('connectTitle');
+  const connectMsg = document.getElementById('connectMsg');
+  try{
+    await loadAll();
+    document.getElementById('connectScreen').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    renderAll();
+    updateNotifStatus();
+    checkAndNotify();
+  }catch(err){
+    console.error(err);
+    let hasCache=false;
+    try{
+      const raw = localStorage.getItem('diario_cache');
+      if(raw){ const c=JSON.parse(raw); notas=c.notas||{}; atividade=c.atividade||{}; temas=c.temas||{}; hasCache=true; }
+    }catch(e){}
+    connectTitle.textContent = 'Não consegui conectar 😕';
+    connectMsg.innerHTML =
+      '<span style="font-family:var(--font-mono);font-size:11.5px;color:var(--late);display:block;text-align:left;background:var(--bg-soft);padding:10px;border-radius:8px;margin:10px 0;">'+err.message+'</span>'+
+      (hasCache?'Existe uma cópia local salva.<br><br>':'')+
+      '<button class="mini-btn" id="btnRetryBoot">Tentar de novo</button> '+
+      (hasCache?'<button class="mini-btn" id="btnContinueOffline">Continuar offline</button>':'');
+    document.getElementById('btnRetryBoot').addEventListener('click', ()=>location.reload());
+    const cbtn = document.getElementById('btnContinueOffline');
+    if(cbtn) cbtn.addEventListener('click', ()=>{
+      document.getElementById('connectScreen').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
+      renderAll();
+    });
+  }
+})();
+</script>
+</body>
+</html>
