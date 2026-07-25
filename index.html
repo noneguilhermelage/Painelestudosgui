@@ -87,7 +87,7 @@
   .cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;}
   .cal-weekdays span{display:block;text-align:center;font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--text-faint);font-family:var(--font-mono);}
   .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-  .cal-cell{aspect-ratio:1;border-radius:var(--radius-sm);background:var(--heat-0);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:transform .1s;}
+  .cal-cell{position:relative;aspect-ratio:1;border-radius:var(--radius-sm);background:var(--heat-0);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:transform .1s;}
   .cal-cell:hover{transform:scale(1.06);}
   .cal-cell.empty{background:transparent;cursor:default;}
   .cal-cell.empty:hover{transform:none;}
@@ -97,6 +97,21 @@
   .cal-cell.level-4{background:var(--heat-4);color:#fff;}
   .cal-cell.today-ring{box-shadow:0 0 0 2px var(--text);}
   .cal-cell.selected-ring{box-shadow:0 0 0 2px var(--accent);}
+  .cal-dot{position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#000;box-shadow:0 0 0 1px rgba(255,255,255,.55);}
+
+  /* lembretes/eventos — mantido discreto de propósito */
+  .evento-box{margin:2px 0 18px;}
+  .evento-toggle{background:none;border:1px dashed var(--border);border-radius:var(--radius-sm);padding:7px 11px;font-size:12px;color:var(--text-faint);cursor:pointer;font-family:var(--font-body);}
+  .evento-toggle:hover{color:var(--text-muted);border-color:var(--text-faint);}
+  .evento-chip{display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:var(--bg-soft);border-radius:var(--radius-sm);padding:8px 11px;font-size:12.5px;color:var(--text-muted);}
+  .evento-texto{flex:1;min-width:0;}
+  .evento-badge{font-family:var(--font-mono);font-size:10px;color:var(--text-faint);background:var(--card);padding:2px 6px;border-radius:20px;border:1px solid var(--border);white-space:nowrap;}
+  .evento-edit{background:none;border:none;font-size:11.5px;color:var(--accent);cursor:pointer;padding:0;}
+  .evento-form{background:var(--bg-soft);border-radius:var(--radius-sm);padding:10px 11px;display:flex;flex-direction:column;gap:8px;}
+  .evento-form input[type="text"]{width:100%;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text);font-size:12.5px;font-family:var(--font-body);box-sizing:border-box;}
+  .evento-form input[type="text"]:focus{outline:none;border-color:var(--accent);}
+  .evento-repeat{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);cursor:pointer;}
+  .evento-form-actions{display:flex;align-items:center;gap:8px;}
   .heat-cell{width:14px;height:14px;border-radius:4px;background:var(--heat-0);display:inline-block;}
   .heat-cell.level-1{background:var(--heat-1);}
   .heat-cell.level-2{background:var(--heat-2);}
@@ -226,6 +241,7 @@
   <div class="card" id="dayPanel">
     <div class="day-panel-title" id="dayPanelTitle">Hoje</div>
     <div class="day-panel-sub" id="dayPanelSub"></div>
+    <div class="evento-box" id="eventoBox"></div>
     <label class="field-label">Nova nota</label>
     <textarea id="novoNotaInput" placeholder="O que você fez/estudou agora? Como foi?"></textarea>
     <div class="time-row" style="margin-top:8px;">
@@ -299,6 +315,8 @@ let config = {
 let notas = {};       // { 'YYYY-MM-DD': [ {id, texto, minutos, criado_em}, ... ] }
 let atividade = {};   // { 'YYYY-MM-DD': count }
 let temas = {};       // { temaId: {nome, criado_em, ultima_interacao, revisoes_qtd} }
+let eventos = {};     // { eventoId: {texto, mes, dia, ano, repete} } — datas/lembretes importantes
+let eventoFormAberto = false;
 let selectedDate = todayKey();
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth(); // mês exibido no calendário (0-indexado)
@@ -346,14 +364,16 @@ async function fbPut(path, data){
 }
 
 async function loadAll(){
-  const [n, a, t, tm] = await Promise.all([
+  const [n, a, t, tm, ev] = await Promise.all([
     fbGet('/diario/notas'),
     fbGet('/diario/atividade'),
     fbGet('/diario/temas'),
-    fbGet('/diario/tempos')
+    fbGet('/diario/tempos'),
+    fbGet('/diario/eventos')
   ]);
   atividade = a || {};
   temas = t || {};
+  eventos = ev || {};
   const rawNotas = n || {};
   const rawTempos = tm || {}; // formato antigo (tempo único por dia) — só usado pra migrar
   notas = {};
@@ -372,7 +392,7 @@ async function loadAll(){
     }
   });
   try{
-    localStorage.setItem('diario_cache', JSON.stringify({notas, atividade, temas}));
+    localStorage.setItem('diario_cache', JSON.stringify({notas, atividade, temas, eventos}));
   }catch(e){}
 }
 async function logAtividade(dateKey){
@@ -482,9 +502,88 @@ function selecionarDia(dateKey){
   document.getElementById('novoNotaInput').value = '';
   document.getElementById('novoTempoInput').value = '';
   document.getElementById('saveStatus').textContent = '';
+  eventoFormAberto = false;
   renderCalendar();
   renderNotasDoDia();
+  renderEventoDoDia();
   document.getElementById('dayPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+/* ============ LEMBRETES / DATAS IMPORTANTES ============ */
+function getEventoParaData(ano, mes, dia){
+  let recorrente = null, especifico = null;
+  Object.keys(eventos).forEach(id=>{
+    const ev = eventos[id];
+    if(!ev || ev.mes!==mes || ev.dia!==dia) return;
+    if(ev.repete) recorrente = Object.assign({id}, ev);
+    else if(ev.ano===ano) especifico = Object.assign({id}, ev);
+  });
+  return especifico || recorrente || null;
+}
+function renderEventoDoDia(){
+  const box = document.getElementById('eventoBox');
+  const [ano, mes, dia] = selectedDate.split('-').map(Number);
+  const ev = getEventoParaData(ano, mes, dia);
+
+  if(eventoFormAberto){
+    const texto = ev ? escapeHtml(ev.texto) : '';
+    const checked = ev && ev.repete ? 'checked' : '';
+    box.innerHTML =
+      '<div class="evento-form">'+
+        '<input type="text" id="eventoTextoInput" maxlength="80" placeholder="ex: prova de física, aniversário..." value="'+texto+'">'+
+        '<label class="evento-repeat"><input type="checkbox" id="eventoRepeteInput" '+checked+'> repetir todo ano</label>'+
+        '<div class="evento-form-actions">'+
+          '<button class="mini-btn" data-action="salvar-evento">Salvar</button>'+
+          '<button class="mini-btn" data-action="cancelar-evento">Cancelar</button>'+
+          (ev ? '<button class="tema-del" data-action="del-evento" data-id="'+ev.id+'" title="Excluir">✕</button>' : '')+
+        '</div>'+
+      '</div>';
+    document.getElementById('eventoTextoInput').focus();
+    return;
+  }
+  if(ev){
+    box.innerHTML =
+      '<div class="evento-chip">📌 <span class="evento-texto">'+escapeHtml(ev.texto)+'</span>'+
+        '<span class="evento-badge">'+(ev.repete ? 'todo ano' : ev.ano)+'</span>'+
+        '<button class="evento-edit" data-action="abrir-evento">editar</button>'+
+      '</div>';
+  }else{
+    box.innerHTML = '<button class="evento-toggle" data-action="abrir-evento">📌 marcar data importante</button>';
+  }
+}
+function abrirEventoForm(){ eventoFormAberto = true; renderEventoDoDia(); }
+function cancelarEventoForm(){ eventoFormAberto = false; renderEventoDoDia(); }
+async function salvarEvento(){
+  const texto = document.getElementById('eventoTextoInput').value.trim();
+  const repete = document.getElementById('eventoRepeteInput').checked;
+  if(!texto){ showSaveStatus('Escreva uma descrição pro lembrete.', true); return; }
+  const [ano, mes, dia] = selectedDate.split('-').map(Number);
+  const existente = getEventoParaData(ano, mes, dia);
+  const id = existente ? existente.id : 'ev_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const entry = {texto, mes, dia, ano, repete};
+  eventos[id] = entry;
+  showSaveStatus('Salvando...', false);
+  try{
+    await fbPut('/diario/eventos/'+id, entry);
+    eventoFormAberto = false;
+    showSaveStatus('Salvo ✅', false);
+    renderCalendar();
+    renderEventoDoDia();
+  }catch(err){
+    showSaveStatus('Erro: '+err.message, true);
+  }
+}
+async function excluirEvento(id){
+  if(!confirm('Excluir esse lembrete?')) return;
+  delete eventos[id];
+  eventoFormAberto = false;
+  try{
+    await fbPut('/diario/eventos/'+id, null);
+    renderCalendar();
+    renderEventoDoDia();
+  }catch(err){
+    showSaveStatus('Erro: '+err.message, true);
+  }
 }
 
 /* ============ CALENDÁRIO MENSAL ============ */
@@ -514,7 +613,9 @@ function renderCalendar(){
     const level = minutos===0?0: minutos<30?1: minutos<60?2: minutos<120?3:4;
     const isToday = key===todayKey();
     const isSelected = key===selectedDate;
-    html += '<div class="cal-cell level-'+level+(isToday?' today-ring':'')+(isSelected?' selected-ring':'')+'" data-date="'+key+'" title="'+fmtMinutes(minutos)+' de atividade produtiva">'+day+'</div>';
+    const ev = getEventoParaData(calYear, calMonth+1, day);
+    const title = fmtMinutes(minutos)+' de atividade produtiva'+(ev?(' • 📌 '+ev.texto):'');
+    html += '<div class="cal-cell level-'+level+(isToday?' today-ring':'')+(isSelected?' selected-ring':'')+'" data-date="'+key+'" title="'+escapeHtml(title)+'">'+day+(ev?'<span class="cal-dot"></span>':'')+'</div>';
   }
   document.getElementById('calGrid').innerHTML = html;
 }
@@ -673,6 +774,10 @@ document.addEventListener('click', (e)=>{
     editarNota(id, texto, minutos);
   }
   else if(action==='del-nota') excluirNota(id);
+  else if(action==='abrir-evento') abrirEventoForm();
+  else if(action==='cancelar-evento') cancelarEventoForm();
+  else if(action==='salvar-evento') salvarEvento();
+  else if(action==='del-evento') excluirEvento(id);
   else if(action==='revisar'){ pendingReviewPrompt = id; renderTemas(); }
   else if(action==='revisar-dificil') revisarComDificuldade(id, -1);
   else if(action==='revisar-normal') revisarComDificuldade(id, 1);
@@ -718,8 +823,8 @@ document.getElementById('btnResetAll').addEventListener('click', async ()=>{
   const status = document.getElementById('settingsStatus');
   status.textContent = 'Apagando...';
   try{
-    await fbPut('/diario', {notas:null, atividade:null, temas:null, tempos:null});
-    notas={}; atividade={}; temas={};
+    await fbPut('/diario', {notas:null, atividade:null, temas:null, tempos:null, eventos:null});
+    notas={}; atividade={}; temas={}; eventos={};
     status.className='modal-status ok'; status.textContent='Apagado.';
     renderAll();
   }catch(err){
@@ -766,6 +871,7 @@ function renderAll(){
   document.getElementById('dayPanelTitle').textContent = isToday ? 'Hoje' : fmtDatePT(selectedDate);
   document.getElementById('dayPanelSub').textContent = selectedDate;
   renderNotasDoDia();
+  renderEventoDoDia();
 }
 
 /* ============ AUTO-REFRESH ============ */
@@ -798,7 +904,7 @@ window.addEventListener('pageshow', (e)=>{ if(e.persisted) refreshFromBackend();
     let hasCache=false;
     try{
       const raw = localStorage.getItem('diario_cache');
-      if(raw){ const c=JSON.parse(raw); notas=c.notas||{}; atividade=c.atividade||{}; temas=c.temas||{}; hasCache=true; }
+      if(raw){ const c=JSON.parse(raw); notas=c.notas||{}; atividade=c.atividade||{}; temas=c.temas||{}; eventos=c.eventos||{}; hasCache=true; }
     }catch(e){}
     connectTitle.textContent = 'Não consegui conectar 😕';
     connectMsg.innerHTML =
