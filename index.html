@@ -104,7 +104,15 @@
   .heat-cell.level-4{background:var(--heat-4);}
   .heatmap-legend{display:flex;align-items:center;gap:6px;margin-top:14px;font-size:11px;color:var(--text-faint);}
 
-  /* dia selecionado / nota */
+  /* dia selecionado / nota (balão) */
+  #dayPanel{position:relative;margin-top:2px;}
+  #dayPanel::before{content:'';position:absolute;top:-8px;left:30px;width:15px;height:15px;background:var(--card);border-left:1px solid var(--border);border-top:1px solid var(--border);transform:rotate(45deg);}
+  .field-label{display:block;font-size:11px;font-family:var(--font-mono);letter-spacing:.5px;text-transform:uppercase;color:var(--text-faint);margin:16px 0 6px;}
+  .field-label:first-of-type{margin-top:0;}
+  .time-row{display:flex;align-items:center;gap:10px;}
+  .time-row input{width:90px;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-soft);color:var(--text);font-size:13.5px;font-family:var(--font-mono);}
+  .time-row input:focus{outline:none;border-color:var(--accent);}
+  .time-unit{font-size:12.5px;color:var(--text-muted);}
   .day-panel-title{font-family:var(--font-display);font-size:16px;margin:0 0 3px;}
   .day-panel-sub{font-size:12px;color:var(--text-faint);margin-bottom:14px;}
   textarea{
@@ -194,7 +202,7 @@
         <button class="icon-btn" id="btnCalNext" title="Próximo mês">›</button>
       </div>
     </div>
-    <span class="cal-sub">toque num dia pra ver ou editar a nota daquele dia</span>
+    <span class="cal-sub">toque num dia pra ver sua nota e registrar o tempo estudado</span>
     <div class="cal-weekdays"><span>dom</span><span>seg</span><span>ter</span><span>qua</span><span>qui</span><span>sex</span><span>sáb</span></div>
     <div class="cal-grid" id="calGrid"></div>
     <div class="heatmap-legend">menos
@@ -209,9 +217,15 @@
   <div class="card" id="dayPanel">
     <div class="day-panel-title" id="dayPanelTitle">Hoje</div>
     <div class="day-panel-sub" id="dayPanelSub"></div>
+    <label class="field-label">Sua nota</label>
     <textarea id="dayNoteInput" placeholder="O que você fez/estudou hoje? Como foi?"></textarea>
+    <label class="field-label">Tempo dedicado</label>
+    <div class="time-row">
+      <input type="number" id="dayTimeInput" min="0" step="5" placeholder="0">
+      <span class="time-unit">minutos de atividade produtiva</span>
+    </div>
     <div class="day-actions">
-      <button class="btn btn-primary" id="btnSaveNote">Salvar nota</button>
+      <button class="btn btn-primary" id="btnSaveNote">Salvar</button>
       <span class="save-status" id="saveStatus"></span>
     </div>
   </div>
@@ -270,6 +284,7 @@ let config = {
 };
 let notas = {};       // { 'YYYY-MM-DD': 'texto' }
 let atividade = {};   // { 'YYYY-MM-DD': count }
+let tempos = {};      // { 'YYYY-MM-DD': minutos de atividade produtiva }
 let temas = {};       // { temaId: {nome, criado_em, ultima_interacao, revisoes_qtd} }
 let selectedDate = todayKey();
 let calYear = new Date().getFullYear();
@@ -318,16 +333,18 @@ async function fbPut(path, data){
 }
 
 async function loadAll(){
-  const [n, a, t] = await Promise.all([
+  const [n, a, t, tm] = await Promise.all([
     fbGet('/diario/notas'),
     fbGet('/diario/atividade'),
-    fbGet('/diario/temas')
+    fbGet('/diario/temas'),
+    fbGet('/diario/tempos')
   ]);
   notas = n || {};
   atividade = a || {};
   temas = t || {};
+  tempos = tm || {};
   try{
-    localStorage.setItem('diario_cache', JSON.stringify({notas, atividade, temas}));
+    localStorage.setItem('diario_cache', JSON.stringify({notas, atividade, temas, tempos}));
   }catch(e){}
 }
 async function logAtividade(dateKey){
@@ -344,11 +361,15 @@ function showSaveStatus(msg, isErr){
 }
 async function salvarNota(){
   const texto = document.getElementById('dayNoteInput').value;
+  const minutosRaw = document.getElementById('dayTimeInput').value;
+  const minutos = minutosRaw==='' ? 0 : Math.max(0, parseInt(minutosRaw,10)||0);
   const isNew = !notas[selectedDate] && texto.trim();
   notas[selectedDate] = texto;
+  tempos[selectedDate] = minutos;
   showSaveStatus('Salvando...', false);
   try{
     await fbPut('/diario/notas/'+selectedDate, texto);
+    await fbPut('/diario/tempos/'+selectedDate, minutos);
     if(isNew) await logAtividade(selectedDate);
     showSaveStatus('Salvo ✅', false);
     renderCalendar();
@@ -363,12 +384,19 @@ function selecionarDia(dateKey){
   document.getElementById('dayPanelTitle').textContent = isToday ? 'Hoje' : fmtDatePT(dateKey);
   document.getElementById('dayPanelSub').textContent = dateKey;
   document.getElementById('dayNoteInput').value = notas[dateKey] || '';
+  document.getElementById('dayTimeInput').value = tempos[dateKey] || '';
   document.getElementById('saveStatus').textContent = '';
   renderCalendar();
   document.getElementById('dayPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 /* ============ CALENDÁRIO MENSAL ============ */
+function fmtMinutes(m){
+  m = m||0;
+  if(m<60) return m+'min';
+  const h = Math.floor(m/60), mm = m%60;
+  return h+'h'+(mm?String(mm).padStart(2,'0')+'min':'');
+}
 function renderCalendar(){
   const first = new Date(calYear, calMonth, 1);
   let label = first.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
@@ -385,11 +413,11 @@ function renderCalendar(){
   for(let day=1; day<=daysInMonth; day++){
     const d = new Date(calYear, calMonth, day);
     const key = localKey(d);
-    const count = atividade[key] || 0;
-    const level = count===0?0: count===1?1: count<=3?2: count<=5?3:4;
+    const minutos = tempos[key] || 0;
+    const level = minutos===0?0: minutos<30?1: minutos<60?2: minutos<120?3:4;
     const isToday = key===todayKey();
     const isSelected = key===selectedDate;
-    html += '<div class="cal-cell level-'+level+(isToday?' today-ring':'')+(isSelected?' selected-ring':'')+'" data-date="'+key+'" title="'+count+' registro(s)">'+day+'</div>';
+    html += '<div class="cal-cell level-'+level+(isToday?' today-ring':'')+(isSelected?' selected-ring':'')+'" data-date="'+key+'" title="'+fmtMinutes(minutos)+' de atividade produtiva">'+day+'</div>';
   }
   document.getElementById('calGrid').innerHTML = html;
 }
@@ -586,8 +614,8 @@ document.getElementById('btnResetAll').addEventListener('click', async ()=>{
   const status = document.getElementById('settingsStatus');
   status.textContent = 'Apagando...';
   try{
-    await fbPut('/diario', {notas:null, atividade:null, temas:null});
-    notas={}; atividade={}; temas={};
+    await fbPut('/diario', {notas:null, atividade:null, temas:null, tempos:null});
+    notas={}; atividade={}; temas={}; tempos={};
     status.className='modal-status ok'; status.textContent='Apagado.';
     renderAll();
   }catch(err){
@@ -634,6 +662,7 @@ function renderAll(){
   document.getElementById('dayPanelTitle').textContent = isToday ? 'Hoje' : fmtDatePT(selectedDate);
   document.getElementById('dayPanelSub').textContent = selectedDate;
   document.getElementById('dayNoteInput').value = notas[selectedDate] || '';
+  document.getElementById('dayTimeInput').value = tempos[selectedDate] || '';
 }
 
 /* ============ AUTO-REFRESH ============ */
@@ -666,7 +695,7 @@ window.addEventListener('pageshow', (e)=>{ if(e.persisted) refreshFromBackend();
     let hasCache=false;
     try{
       const raw = localStorage.getItem('diario_cache');
-      if(raw){ const c=JSON.parse(raw); notas=c.notas||{}; atividade=c.atividade||{}; temas=c.temas||{}; hasCache=true; }
+      if(raw){ const c=JSON.parse(raw); notas=c.notas||{}; atividade=c.atividade||{}; temas=c.temas||{}; tempos=c.tempos||{}; hasCache=true; }
     }catch(e){}
     connectTitle.textContent = 'Não consegui conectar 😕';
     connectMsg.innerHTML =
