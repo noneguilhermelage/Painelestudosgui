@@ -80,69 +80,44 @@
   .section-head h2{font-family:var(--font-display);font-size:17px;margin:0;}
   .section-head .sub{font-size:12px;color:var(--text-faint);}
 
-  /* calendario mensal */
+  /* heatmap grande */
   .heatmap-card{padding:24px 22px 20px;}
-  .cal-nav{display:flex;align-items:center;gap:6px;}
-  .cal-sub{display:block;margin:-8px 0 16px;font-size:12px;color:var(--text-faint);}
-  .cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;}
-  .cal-weekdays span{display:block;text-align:center;font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--text-faint);font-family:var(--font-mono);}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-  .cal-cell{position:relative;aspect-ratio:1;border-radius:var(--radius-sm);background:var(--heat-0);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:transform .1s;}
-  .cal-cell:hover{transform:scale(1.06);}
-  .cal-cell.empty{background:transparent;cursor:default;}
-  .cal-cell.empty:hover{transform:none;}
-  .cal-cell.level-1{background:var(--heat-1);color:var(--text);}
-  .cal-cell.level-2{background:var(--heat-2);color:#fff;}
-  .cal-cell.level-3{background:var(--heat-3);color:#fff;}
-  .cal-cell.level-4{background:var(--heat-4);color:#fff;}
-  .cal-cell.today-ring{box-shadow:0 0 0 2px var(--text);}
-  .cal-cell.selected-ring{box-shadow:0 0 0 2px var(--accent);}
-  .cal-dot{position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#000;box-shadow:0 0 0 1px rgba(255,255,255,.55);}
-
-  /* lembretes/eventos — em destaque laranja, mas compacto */
-  .evento-box{margin:2px 0 18px;display:flex;flex-direction:column;gap:6px;}
-  .evento-toggle{background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--radius-sm);padding:8px 12px;font-size:12.5px;font-weight:600;color:var(--accent);cursor:pointer;font-family:var(--font-body);text-align:left;}
-  .evento-toggle:hover{background:var(--accent);color:#fff;}
-  .evento-chip{display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:var(--radius-sm);padding:8px 11px;font-size:12.5px;color:var(--text-muted);}
-  .evento-texto{flex:1;min-width:0;}
-  .evento-badge{font-family:var(--font-mono);font-size:10px;color:var(--accent);background:var(--card);padding:2px 6px;border-radius:20px;border:1px solid var(--accent);white-space:nowrap;}
-  .evento-edit{background:none;border:none;font-size:11.5px;color:var(--accent);font-weight:600;cursor:pointer;padding:0;}
-  .evento-form{background:var(--bg-soft);border-radius:var(--radius-sm);padding:10px 11px;display:flex;flex-direction:column;gap:8px;}
-  .evento-form input[type="text"]{width:100%;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text);font-size:12.5px;font-family:var(--font-body);box-sizing:border-box;}
-  .evento-form input[type="text"]:focus{outline:none;border-color:var(--accent);}
-  .evento-repeat{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);cursor:pointer;}
-  .evento-form-actions{display:flex;align-items:center;gap:8px;}
-  .mini-btn-accent{background:var(--accent);border-color:var(--accent);color:#fff;}
-  .mini-btn-accent:hover{background:var(--accent);color:#fff;opacity:.9;}
-  .heat-cell{width:14px;height:14px;border-radius:4px;background:var(--heat-0);display:inline-block;}
+  .heatmap-scroll{overflow-x:auto;padding-bottom:8px;}
+  .heatmap-inner{display:inline-block;}
+  .heatmap-months{display:grid;grid-auto-flow:column;grid-auto-columns:16px;gap:4px;margin-left:30px;margin-bottom:4px;height:14px;}
+  .heatmap-months span{font-size:10.5px;color:var(--text-faint);font-family:var(--font-mono);}
+  .heatmap-body{display:flex;gap:4px;}
+  .heatmap-daylabels{display:grid;grid-template-rows:repeat(7,16px);gap:4px;width:26px;}
+  .heatmap-daylabels span{font-size:9.5px;color:var(--text-faint);font-family:var(--font-mono);align-self:center;}
+  .heatmap-grid{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,16px);gap:4px;}
+  .heat-cell{width:16px;height:16px;border-radius:4px;background:var(--heat-0);cursor:pointer;transition:transform .1s;}
+  .heat-cell:hover{transform:scale(1.25);}
   .heat-cell.level-1{background:var(--heat-1);}
   .heat-cell.level-2{background:var(--heat-2);}
   .heat-cell.level-3{background:var(--heat-3);}
   .heat-cell.level-4{background:var(--heat-4);}
   .heatmap-legend{display:flex;align-items:center;gap:6px;margin-top:14px;font-size:11px;color:var(--text-faint);}
+  .heatmap-legend .heat-cell{cursor:default;width:14px;height:14px;}
+  .heatmap-legend .heat-cell:hover{transform:none;}
 
-  /* dia selecionado / nota (balão) */
-  #dayPanel{position:relative;margin-top:2px;}
-  #dayPanel::before{content:'';position:absolute;top:-8px;left:30px;width:15px;height:15px;background:var(--card);border-left:1px solid var(--border);border-top:1px solid var(--border);transform:rotate(45deg);}
-  .field-label{display:block;font-size:11px;font-family:var(--font-mono);letter-spacing:.5px;text-transform:uppercase;color:var(--text-faint);margin:16px 0 6px;}
-  .field-label:first-of-type{margin-top:0;}
-  .time-row{display:flex;align-items:center;gap:10px;}
-  .time-row input{width:90px;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-soft);color:var(--text);font-size:13.5px;font-family:var(--font-mono);}
-  .time-row input:focus{outline:none;border-color:var(--accent);}
-  .time-unit{font-size:12.5px;color:var(--text-muted);}
-  .notas-divider{display:flex;justify-content:space-between;align-items:center;margin:22px 0 10px;padding-top:16px;border-top:1px solid var(--border);}
-  .notas-total{display:flex;align-items:baseline;gap:5px;}
-  .notas-total-label{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-faint);}
-  .notas-total-value{font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--accent);}
-  .nota-row{background:var(--bg-soft);border-radius:var(--radius-md);padding:12px 13px;margin-bottom:8px;}
-  .nota-row-text{width:100%;min-height:54px;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px;font-family:var(--font-body);resize:vertical;line-height:1.5;}
-  .nota-row-text:focus{outline:none;border-color:var(--accent);}
-  .nota-row-foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:10px;flex-wrap:wrap;}
-  .nota-row-time{width:64px;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text);font-size:12.5px;font-family:var(--font-mono);}
-  .nota-row-time:focus{outline:none;border-color:var(--accent);}
-  .nota-row-actions{display:flex;align-items:center;gap:6px;}
+  /* dia selecionado / nota */
   .day-panel-title{font-family:var(--font-display);font-size:16px;margin:0 0 3px;}
   .day-panel-sub{font-size:12px;color:var(--text-faint);margin-bottom:14px;}
+  .day-panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  #btnConquista.on{background:#E4F7EC;color:#1F8E56;border-color:#9EE0BB;}
+  .field-inline{display:flex;align-items:center;gap:10px;margin-top:12px;}
+  .field-inline label{font-size:12.5px;color:var(--text-muted);}
+  .field-inline input{
+    width:90px;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);
+    background:var(--bg-soft);color:var(--text);font-size:13.5px;font-family:var(--font-mono);
+  }
+  .field-inline input:focus{outline:none;border-color:var(--accent);}
+  .questoes-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .questoes-row input{
+    width:110px;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);
+    background:var(--bg-soft);color:var(--text);font-size:15px;font-family:var(--font-mono);font-weight:600;
+  }
+  .questoes-row input:focus{outline:none;border-color:var(--accent);}
   textarea{
     width:100%;min-height:110px;padding:12px 14px;border-radius:var(--radius-md);border:1px solid var(--border);
     background:var(--bg-soft);color:var(--text);font-size:13.5px;font-family:var(--font-body);resize:vertical;line-height:1.6;
@@ -223,16 +198,18 @@
 
   <div class="card heatmap-card">
     <div class="section-head">
-      <h2 id="calMonthLabel">Julho 2026</h2>
-      <div class="cal-nav">
-        <button class="icon-btn" id="btnCalPrev" title="Mês anterior">‹</button>
-        <button class="mini-btn" id="btnCalToday">hoje</button>
-        <button class="icon-btn" id="btnCalNext" title="Próximo mês">›</button>
+      <h2>Seu ano</h2>
+      <span class="sub" id="heatmapSub">clique num quadrado pra ver ou editar a nota daquele dia</span>
+    </div>
+    <div class="heatmap-scroll">
+      <div class="heatmap-inner">
+        <div class="heatmap-months" id="heatmapMonths"></div>
+        <div class="heatmap-body">
+          <div class="heatmap-daylabels"><span></span><span>seg</span><span></span><span>qua</span><span></span><span>sex</span><span></span></div>
+          <div class="heatmap-grid" id="heatmapGrid"></div>
+        </div>
       </div>
     </div>
-    <span class="cal-sub">toque num dia pra ver sua nota e registrar o tempo estudado</span>
-    <div class="cal-weekdays"><span>dom</span><span>seg</span><span>ter</span><span>qua</span><span>qui</span><span>sex</span><span>sáb</span></div>
-    <div class="cal-grid" id="calGrid"></div>
     <div class="heatmap-legend">menos
       <span class="heat-cell level-0"></span>
       <span class="heat-cell level-1"></span>
@@ -243,25 +220,34 @@
   </div>
 
   <div class="card" id="dayPanel">
-    <div class="day-panel-title" id="dayPanelTitle">Hoje</div>
-    <div class="day-panel-sub" id="dayPanelSub"></div>
-    <div class="evento-box" id="eventoBox"></div>
-    <label class="field-label">Nova nota</label>
-    <textarea id="novoNotaInput" placeholder="O que você fez/estudou agora? Como foi?"></textarea>
-    <div class="time-row" style="margin-top:8px;">
-      <input type="number" id="novoTempoInput" min="0" step="5" placeholder="0">
-      <span class="time-unit">minutos dessa atividade</span>
+    <div class="day-panel-head">
+      <div>
+        <div class="day-panel-title" id="dayPanelTitle">Hoje</div>
+        <div class="day-panel-sub" id="dayPanelSub"></div>
+      </div>
+      <button class="mini-btn" id="btnConquista">Marcar dia</button>
+    </div>
+    <textarea id="dayNoteInput" placeholder="O que você fez/estudou hoje? Como foi?"></textarea>
+    <div class="field-inline">
+      <label for="tempoInput">Tempo de estudo (min)</label>
+      <input type="number" min="0" id="tempoInput" placeholder="0">
     </div>
     <div class="day-actions">
-      <button class="btn btn-primary" id="btnAddNota">+ Adicionar nota</button>
+      <button class="btn btn-primary" id="btnSaveNote">Salvar</button>
       <span class="save-status" id="saveStatus"></span>
     </div>
+  </div>
 
-    <div class="notas-divider">
-      <span class="field-label" style="margin:0;">Notas do dia</span>
-      <span class="notas-total" id="notasTotal"></span>
+  <div class="card">
+    <div class="section-head">
+      <h2>🧮 Questões</h2>
+      <span class="sub" id="questoesSub"></span>
     </div>
-    <div class="tema-list" id="notasList"></div>
+    <div class="questoes-row">
+      <input type="number" min="0" id="questoesInput" placeholder="0">
+      <button class="btn btn-primary" id="btnSaveQuestoes">Salvar questões</button>
+      <span class="save-status" id="questoesStatus"></span>
+    </div>
   </div>
 
   <div class="card">
@@ -316,18 +302,16 @@ let config = {
   url: DEFAULT_URL,
   intervals: [3,7,16,35,90]
 };
-let notas = {};       // { 'YYYY-MM-DD': [ {id, texto, minutos, criado_em}, ... ] }
+let notas = {};       // { 'YYYY-MM-DD': 'texto' }
 let atividade = {};   // { 'YYYY-MM-DD': count }
 let temas = {};       // { temaId: {nome, criado_em, ultima_interacao, revisoes_qtd} }
-let eventos = {};     // { eventoId: {texto, mes, dia, ano, repete} } — datas/lembretes importantes
-let eventoFormAlvo = null; // null = fechado; 'novo' = form de novo lembrete; ou o id do lembrete em edição
+let questoes = {};    // { 'YYYY-MM-DD': numero de questões feitas }
+let tempo = {};       // { 'YYYY-MM-DD': minutos de estudo }
+let conquistas = {};  // { 'YYYY-MM-DD': true }
 let selectedDate = todayKey();
-let calYear = new Date().getFullYear();
-let calMonth = new Date().getMonth(); // mês exibido no calendário (0-indexado)
 let pendingReviewPrompt = null;
 
-function localKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function todayKey(){ return localKey(new Date()); }
+function todayKey(){ return new Date().toISOString().slice(0,10); }
 function fmtDatePT(key){
   const d = new Date(key+'T00:00:00');
   return d.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'});
@@ -368,35 +352,22 @@ async function fbPut(path, data){
 }
 
 async function loadAll(){
-  const [n, a, t, tm, ev] = await Promise.all([
+  const [n, a, t, q, tp, c] = await Promise.all([
     fbGet('/diario/notas'),
     fbGet('/diario/atividade'),
     fbGet('/diario/temas'),
-    fbGet('/diario/tempos'),
-    fbGet('/diario/eventos')
+    fbGet('/diario/questoes'),
+    fbGet('/diario/tempo'),
+    fbGet('/diario/conquistas')
   ]);
+  notas = n || {};
   atividade = a || {};
   temas = t || {};
-  eventos = ev || {};
-  const rawNotas = n || {};
-  const rawTempos = tm || {}; // formato antigo (tempo único por dia) — só usado pra migrar
-  notas = {};
-  Object.keys(rawNotas).forEach(key=>{
-    const val = rawNotas[key];
-    if(val && typeof val==='object' && !Array.isArray(val)){
-      // formato novo: { entryId: {texto, minutos, criado_em} }
-      notas[key] = Object.keys(val).map(id=>Object.assign({id}, val[id]));
-    } else if(Array.isArray(val)){
-      notas[key] = val.filter(Boolean).map((e,i)=>Object.assign({id:'e'+i}, e));
-    } else if(typeof val==='string' && val.trim()){
-      // formato antigo: nota única em texto puro
-      notas[key] = [{id:'legacy', texto:val, minutos:rawTempos[key]||0}];
-    } else {
-      notas[key] = [];
-    }
-  });
+  questoes = q || {};
+  tempo = tp || {};
+  conquistas = c || {};
   try{
-    localStorage.setItem('diario_cache', JSON.stringify({notas, atividade, temas, eventos}));
+    localStorage.setItem('diario_cache', JSON.stringify({notas, atividade, temas, questoes, tempo, conquistas}));
   }catch(e){}
 }
 async function logAtividade(dateKey){
@@ -411,241 +382,138 @@ function showSaveStatus(msg, isErr){
   el.style.color = isErr ? 'var(--late)' : 'var(--text-faint)';
   if(!isErr) setTimeout(()=>{ if(el.textContent===msg) el.textContent=''; }, 2500);
 }
-function escapeHtml(s){
-  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-function entriesToObj(arr){
-  const obj = {};
-  (arr||[]).forEach(e=>{ obj[e.id] = {texto:e.texto||'', minutos:e.minutos||0, criado_em:e.criado_em||new Date().toISOString()}; });
-  return obj;
-}
-async function salvarDia(dateKey){
-  // sempre grava o dia inteiro (não um sub-caminho) — evita corromper notas
-  // antigas que ainda estejam no formato de texto único
-  await fbPut('/diario/notas/'+dateKey, entriesToObj(notas[dateKey]));
-}
-async function adicionarNota(){
-  const textoEl = document.getElementById('novoNotaInput');
-  const tempoEl = document.getElementById('novoTempoInput');
-  const texto = textoEl.value.trim();
-  const minutosRaw = tempoEl.value;
-  const minutos = minutosRaw==='' ? 0 : Math.max(0, parseInt(minutosRaw,10)||0);
-  if(!texto && !minutos){ showSaveStatus('Escreva algo ou informe um tempo.', true); return; }
-  const id = 'n_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-  const isFirstOfDay = !(notas[selectedDate] && notas[selectedDate].length);
-  if(!notas[selectedDate]) notas[selectedDate] = [];
-  notas[selectedDate].push({id, texto, minutos, criado_em:new Date().toISOString()});
+async function salvarNota(){
+  const texto = document.getElementById('dayNoteInput').value;
+  const tempoMin = Math.max(0, Number(document.getElementById('tempoInput').value) || 0);
+  const isNew = (!notas[selectedDate] && texto.trim()) || (!tempo[selectedDate] && tempoMin>0);
+  notas[selectedDate] = texto;
+  tempo[selectedDate] = tempoMin;
   showSaveStatus('Salvando...', false);
   try{
-    await salvarDia(selectedDate);
-    if(isFirstOfDay) await logAtividade(selectedDate);
-    textoEl.value = ''; tempoEl.value = '';
-    showSaveStatus('Adicionado ✅', false);
-    renderCalendar();
-    renderChips();
-    renderNotasDoDia();
-  }catch(err){
-    showSaveStatus('Erro: '+err.message, true);
-  }
-}
-async function editarNota(id, novoTexto, novosMinutos){
-  const arr = notas[selectedDate] || [];
-  const entry = arr.find(e=>e.id===id);
-  if(!entry) return;
-  entry.texto = novoTexto;
-  entry.minutos = novosMinutos;
-  showSaveStatus('Salvando...', false);
-  try{
-    await salvarDia(selectedDate);
+    await Promise.all([
+      fbPut('/diario/notas/'+selectedDate, texto),
+      fbPut('/diario/tempo/'+selectedDate, tempoMin)
+    ]);
+    if(isNew) await logAtividade(selectedDate);
     showSaveStatus('Salvo ✅', false);
-    renderCalendar();
-    renderNotasDoDia();
-  }catch(err){
-    showSaveStatus('Erro: '+err.message, true);
-  }
-}
-async function excluirNota(id){
-  if(!confirm('Excluir essa nota?')) return;
-  notas[selectedDate] = (notas[selectedDate]||[]).filter(e=>e.id!==id);
-  try{
-    await salvarDia(selectedDate);
-    renderCalendar();
+    renderHeatmap();
     renderChips();
-    renderNotasDoDia();
   }catch(err){
     showSaveStatus('Erro: '+err.message, true);
   }
 }
-function renderNotasDoDia(){
-  const list = document.getElementById('notasList');
-  const entries = notas[selectedDate] || [];
-  const total = entries.reduce((s,e)=>s+(e.minutos||0),0);
-  document.getElementById('notasTotal').innerHTML = entries.length
-    ? '<span class="notas-total-label">total</span><span class="notas-total-value">'+fmtMinutes(total)+'</span>'
-    : '';
-  if(!entries.length){
-    list.innerHTML = '<div class="tema-empty">Nenhuma nota registrada nesse dia ainda.</div>';
-    return;
+function showQuestoesStatus(msg, isErr){
+  const el = document.getElementById('questoesStatus');
+  el.textContent = msg;
+  el.style.color = isErr ? 'var(--late)' : 'var(--text-faint)';
+  if(!isErr) setTimeout(()=>{ if(el.textContent===msg) el.textContent=''; }, 2500);
+}
+async function salvarQuestoes(){
+  const qtd = Math.max(0, Number(document.getElementById('questoesInput').value) || 0);
+  const isNew = !questoes[selectedDate] && qtd>0;
+  questoes[selectedDate] = qtd;
+  showQuestoesStatus('Salvando...', false);
+  try{
+    await fbPut('/diario/questoes/'+selectedDate, qtd);
+    if(isNew) await logAtividade(selectedDate);
+    showQuestoesStatus('Salvo ✅', false);
+    updateQuestoesSub();
+    renderHeatmap();
+    renderChips();
+  }catch(err){
+    showQuestoesStatus('Erro: '+err.message, true);
   }
-  list.innerHTML = entries.map(e=>
-    '<div class="nota-row">'+
-      '<textarea class="nota-row-text" data-id="'+e.id+'" placeholder="nota vazia...">'+escapeHtml(e.texto)+'</textarea>'+
-      '<div class="nota-row-foot">'+
-        '<div class="time-row"><input type="number" class="nota-row-time" data-id="'+e.id+'" min="0" step="5" value="'+(e.minutos||0)+'"><span class="time-unit">min</span></div>'+
-        '<div class="nota-row-actions">'+
-          '<button class="mini-btn" data-action="salvar-nota" data-id="'+e.id+'">Salvar</button>'+
-          '<button class="tema-del" data-action="del-nota" data-id="'+e.id+'" title="Excluir">✕</button>'+
-        '</div>'+
-      '</div>'+
-    '</div>'
-  ).join('');
+}
+function updateQuestoesSub(){
+  const n = questoes[selectedDate] || 0;
+  const isToday = selectedDate === todayKey();
+  document.getElementById('questoesSub').textContent = (isToday?'hoje':selectedDate)+': '+n+' questõe'+(n===1?'':'s');
+}
+function updateConquistaBtn(){
+  const btn = document.getElementById('btnConquista');
+  const isOn = !!conquistas[selectedDate];
+  btn.classList.toggle('on', isOn);
+  btn.textContent = isOn ? 'Dia marcado' : 'Marcar dia';
+}
+async function toggleConquista(){
+  const isOn = !!conquistas[selectedDate];
+  if(isOn) delete conquistas[selectedDate];
+  else conquistas[selectedDate] = true;
+  updateConquistaBtn();
+  renderHeatmap();
+  try{
+    await fbPut('/diario/conquistas/'+selectedDate, isOn ? null : true);
+  }catch(err){
+    showSaveStatus('Erro ao sincronizar: '+err.message, true);
+  }
 }
 function selecionarDia(dateKey){
   selectedDate = dateKey;
   const isToday = dateKey === todayKey();
   document.getElementById('dayPanelTitle').textContent = isToday ? 'Hoje' : fmtDatePT(dateKey);
   document.getElementById('dayPanelSub').textContent = dateKey;
-  document.getElementById('novoNotaInput').value = '';
-  document.getElementById('novoTempoInput').value = '';
+  document.getElementById('dayNoteInput').value = notas[dateKey] || '';
+  document.getElementById('tempoInput').value = tempo[dateKey] || '';
+  document.getElementById('questoesInput').value = questoes[dateKey] || '';
   document.getElementById('saveStatus').textContent = '';
-  eventoFormAlvo = null;
-  renderCalendar();
-  renderNotasDoDia();
-  renderEventoDoDia();
+  document.getElementById('questoesStatus').textContent = '';
+  updateQuestoesSub();
+  updateConquistaBtn();
+  renderHeatmap();
   document.getElementById('dayPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
-/* ============ LEMBRETES / DATAS IMPORTANTES ============ */
-function getEventosParaData(ano, mes, dia){
-  const out = [];
-  Object.keys(eventos).forEach(id=>{
-    const ev = eventos[id];
-    if(!ev || ev.mes!==mes || ev.dia!==dia) return;
-    if(ev.repete || ev.ano===ano) out.push(Object.assign({id}, ev));
-  });
-  return out;
+/* ============ HEATMAP GRANDE (ano inteiro) ============ */
+function buildRingShadow(isToday, isSelected, isConquista){
+  const shadows = [];
+  let spread = 2;
+  if(isToday){ shadows.push('0 0 0 '+spread+'px var(--text)'); spread += 2; }
+  if(isSelected){ shadows.push('0 0 0 '+spread+'px var(--accent)'); spread += 2; }
+  if(isConquista){ shadows.push('0 0 0 '+spread+'px #2FBF6F'); spread += 2; }
+  return shadows.join(',');
 }
-function eventoFormHtml(ev){
-  const texto = ev ? escapeHtml(ev.texto) : '';
-  const checked = ev && ev.repete ? 'checked' : '';
-  return '<div class="evento-form">'+
-      '<input type="text" id="eventoTextoInput" maxlength="80" placeholder="ex: prova de física, aniversário..." value="'+texto+'">'+
-      '<label class="evento-repeat"><input type="checkbox" id="eventoRepeteInput" '+checked+'> repetir todo ano</label>'+
-      '<div class="evento-form-actions">'+
-        '<button class="mini-btn mini-btn-accent" data-action="salvar-evento">Salvar</button>'+
-        '<button class="mini-btn" data-action="cancelar-evento">Cancelar</button>'+
-        (ev ? '<button class="tema-del" data-action="del-evento" data-id="'+ev.id+'" title="Excluir">✕</button>' : '')+
-      '</div>'+
-    '</div>';
-}
-function renderEventoDoDia(){
-  const box = document.getElementById('eventoBox');
-  const [ano, mes, dia] = selectedDate.split('-').map(Number);
-  const evs = getEventosParaData(ano, mes, dia);
+function renderHeatmap(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const weeksBack = 52;
+  const daysBack = weeksBack*7 + today.getDay();
+  const start = new Date(today.getTime() - daysBack*86400000);
 
-  let html = '';
-  evs.forEach(ev=>{
-    if(eventoFormAlvo === ev.id){
-      html += eventoFormHtml(ev);
-    }else{
-      html += '<div class="evento-chip">📌 <span class="evento-texto">'+escapeHtml(ev.texto)+'</span>'+
-        '<span class="evento-badge">'+(ev.repete ? 'todo ano' : ev.ano)+'</span>'+
-        '<button class="evento-edit" data-action="abrir-evento" data-id="'+ev.id+'">editar</button>'+
-      '</div>';
-    }
-  });
+  const gridEl = document.getElementById('heatmapGrid');
+  const monthsEl = document.getElementById('heatmapMonths');
+  let gridHtml = '';
+  let monthsHtml = '';
+  let lastMonth = -1;
+  const totalCols = Math.ceil((daysBack+1)/7);
 
-  if(eventoFormAlvo === 'novo'){
-    html += eventoFormHtml(null);
-  }else{
-    const label = evs.length ? '+ adicionar outra data importante' : '📌 marcar data importante';
-    html += '<button class="evento-toggle" data-action="abrir-evento" data-id="novo">'+label+'</button>';
-  }
-
-  box.innerHTML = html;
-  const inp = document.getElementById('eventoTextoInput');
-  if(inp) inp.focus();
-}
-function abrirEventoForm(alvo){ eventoFormAlvo = alvo; renderEventoDoDia(); }
-function cancelarEventoForm(){ eventoFormAlvo = null; renderEventoDoDia(); }
-async function salvarEvento(){
-  const texto = document.getElementById('eventoTextoInput').value.trim();
-  const repete = document.getElementById('eventoRepeteInput').checked;
-  if(!texto){ showSaveStatus('Escreva uma descrição pro lembrete.', true); return; }
-  const [ano, mes, dia] = selectedDate.split('-').map(Number);
-  const id = (eventoFormAlvo && eventoFormAlvo!=='novo') ? eventoFormAlvo : 'ev_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-  const entry = {texto, mes, dia, ano, repete};
-  eventos[id] = entry;
-  showSaveStatus('Salvando...', false);
-  try{
-    await fbPut('/diario/eventos/'+id, entry);
-    eventoFormAlvo = null;
-    showSaveStatus('Salvo ✅', false);
-    renderCalendar();
-    renderEventoDoDia();
-  }catch(err){
-    showSaveStatus('Erro: '+err.message, true);
-  }
-}
-async function excluirEvento(id){
-  if(!confirm('Excluir esse lembrete?')) return;
-  delete eventos[id];
-  eventoFormAlvo = null;
-  try{
-    await fbPut('/diario/eventos/'+id, null);
-    renderCalendar();
-    renderEventoDoDia();
-  }catch(err){
-    showSaveStatus('Erro: '+err.message, true);
-  }
-}
-
-/* ============ CALENDÁRIO MENSAL ============ */
-function fmtMinutes(m){
-  m = m||0;
-  if(m<60) return m+'min';
-  const h = Math.floor(m/60), mm = m%60;
-  return h+'h'+(mm?String(mm).padStart(2,'0')+'min':'');
-}
-function renderCalendar(){
-  const first = new Date(calYear, calMonth, 1);
-  let label = first.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
-  label = label.charAt(0).toUpperCase()+label.slice(1);
-  document.getElementById('calMonthLabel').textContent = label;
-
-  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
-  const startWeekday = first.getDay(); // 0 = domingo ... 6 = sábado
-
-  let html = '';
-  for(let i=0;i<startWeekday;i++){
-    html += '<div class="cal-cell empty"></div>';
-  }
-  for(let day=1; day<=daysInMonth; day++){
-    const d = new Date(calYear, calMonth, day);
-    const key = localKey(d);
-    const minutos = (notas[key]||[]).reduce((s,e)=>s+(e.minutos||0),0);
-    const level = minutos===0?0: minutos<30?1: minutos<60?2: minutos<120?3:4;
+  for(let i=0;i<=daysBack;i++){
+    const d = new Date(start.getTime() + i*86400000);
+    const key = d.toISOString().slice(0,10);
+    const count = atividade[key] || 0;
+    const qtdQuestoes = questoes[key] || 0;
+    const level = count===0?0: count===1?1: count<=3?2: count<=5?3:4;
+    const col = Math.floor(i/7)+1;
+    const row = d.getDay()===0?7:d.getDay(); // segunda=1 ... domingo=7
     const isToday = key===todayKey();
     const isSelected = key===selectedDate;
-    const evs = getEventosParaData(calYear, calMonth+1, day);
-    const title = fmtMinutes(minutos)+' de atividade produtiva'+(evs.length?(' • 📌 '+evs.map(e=>e.texto).join(', ')):'');
-    html += '<div class="cal-cell level-'+level+(isToday?' today-ring':'')+(isSelected?' selected-ring':'')+'" data-date="'+key+'" title="'+escapeHtml(title)+'">'+day+(evs.length?'<span class="cal-dot"></span>':'')+'</div>';
+    const isConquista = !!conquistas[key];
+    const label = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const tempoMin = tempo[key] || 0;
+    const tooltip = label+' — '+count+' registro(s)'+(qtdQuestoes>0 ? ' · '+qtdQuestoes+' questões' : '')+(tempoMin>0 ? ' · '+tempoMin+'min' : '')+(isConquista ? ' · dia marcado' : '');
+    const ringShadow = buildRingShadow(isToday, isSelected, isConquista);
+    const shadowStyle = ringShadow ? 'box-shadow:'+ringShadow+';' : '';
+    gridHtml += '<div class="heat-cell level-'+level+'" data-date="'+key+'" title="'+tooltip+'" style="grid-column:'+col+';grid-row:'+row+';'+shadowStyle+'"></div>';
+
+    if(d.getDate()===1 && d.getMonth()!==lastMonth){
+      lastMonth = d.getMonth();
+      const mname = d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
+      monthsHtml += '<span style="grid-column:'+col+'">'+mname+'</span>';
+    }
   }
-  document.getElementById('calGrid').innerHTML = html;
+  gridEl.innerHTML = gridHtml;
+  gridEl.style.gridTemplateColumns = 'repeat('+totalCols+',16px)';
+  monthsEl.innerHTML = monthsHtml;
+  monthsEl.style.gridTemplateColumns = 'repeat('+totalCols+',16px)';
 }
-function calGoTo(year, month){
-  calYear = year; calMonth = month;
-  if(calMonth<0){ calMonth = 11; calYear--; }
-  if(calMonth>11){ calMonth = 0; calYear++; }
-  renderCalendar();
-}
-document.getElementById('btnCalPrev').addEventListener('click', ()=>calGoTo(calYear, calMonth-1));
-document.getElementById('btnCalNext').addEventListener('click', ()=>calGoTo(calYear, calMonth+1));
-document.getElementById('btnCalToday').addEventListener('click', ()=>{
-  const t = new Date();
-  calGoTo(t.getFullYear(), t.getMonth());
-  selecionarDia(todayKey());
-});
 
 /* ============ CHIPS ============ */
 function computeStreak(){
@@ -653,12 +521,12 @@ function computeStreak(){
   let d = new Date();
   d.setHours(0,0,0,0);
   // se hoje ainda nao tem nota, comeca a contar de ontem (nao quebra o streak antes do dia acabar)
-  if(!(notas[todayKey()] && notas[todayKey()].length)){
+  if(!notas[todayKey()] || !notas[todayKey()].trim()){
     d.setDate(d.getDate()-1);
   }
   while(true){
-    const key = localKey(d);
-    if(notas[key] && notas[key].length){
+    const key = d.toISOString().slice(0,10);
+    if(notas[key] && notas[key].trim()){
       streak++;
       d.setDate(d.getDate()-1);
     } else break;
@@ -667,7 +535,9 @@ function computeStreak(){
 }
 function renderChips(){
   const streak = computeStreak();
-  const totalNotas = Object.values(notas).reduce((s,arr)=>s+(Array.isArray(arr)?arr.length:0),0);
+  const totalNotas = Object.values(notas).filter(t=>t && t.trim()).length;
+  const totalQuestoes = Object.values(questoes).reduce((s,n)=>s+(Number(n)||0),0);
+  const totalConquistas = Object.keys(conquistas).filter(k=>conquistas[k]).length;
   const dueCount = Object.keys(temas).filter(id=>{
     const r = getReviewState(temas[id]);
     return r.state==='atrasado' || r.state==='revisar_breve';
@@ -675,6 +545,8 @@ function renderChips(){
   document.getElementById('chipRow').innerHTML =
     '<div class="chip">🔥 <b>'+streak+'</b> dias seguidos</div>'+
     '<div class="chip">📝 <b>'+totalNotas+'</b> notas registradas</div>'+
+    '<div class="chip">🧮 <b>'+totalQuestoes+'</b> questões no total</div>'+
+    '<div class="chip">🏆 <b>'+totalConquistas+'</b> conquistas</div>'+
     '<div class="chip">🔁 <b>'+dueCount+'</b> temas pra revisar</div>';
 }
 
@@ -749,7 +621,7 @@ async function addTema(){
   temas[id] = {nome, criado_em:now, ultima_interacao:now, revisoes_qtd:0};
   input.value='';
   renderTemas(); renderChips();
-  try{ await fbPut('/diario/temas/'+id, temas[id]); await logAtividade(todayKey()); renderCalendar(); }
+  try{ await fbPut('/diario/temas/'+id, temas[id]); await logAtividade(todayKey()); renderHeatmap(); }
   catch(err){ showSaveStatus('Erro ao salvar tema: '+err.message, true); }
 }
 async function revisarComDificuldade(id, delta){
@@ -759,7 +631,7 @@ async function revisarComDificuldade(id, delta){
   tema.revisoes_qtd = Math.max(0, (tema.revisoes_qtd||0) + delta);
   tema.ultima_interacao = new Date().toISOString();
   renderTemas(); renderChips();
-  try{ await fbPut('/diario/temas/'+id, tema); await logAtividade(todayKey()); renderCalendar(); }
+  try{ await fbPut('/diario/temas/'+id, tema); await logAtividade(todayKey()); renderHeatmap(); }
   catch(err){ showSaveStatus('Erro ao sincronizar: '+err.message, true); }
 }
 async function delTema(id){
@@ -771,7 +643,7 @@ async function delTema(id){
 
 /* ============ EVENTOS ============ */
 document.addEventListener('click', (e)=>{
-  const cell = e.target.closest('.cal-cell[data-date]');
+  const cell = e.target.closest('.heat-cell[data-date]');
   if(cell){ selecionarDia(cell.dataset.date); return; }
 
   const btn = e.target.closest('[data-action]');
@@ -781,24 +653,15 @@ document.addEventListener('click', (e)=>{
   }
   const action = btn.dataset.action;
   const id = btn.dataset.id;
-  if(action==='salvar-nota'){
-    const row = btn.closest('.nota-row');
-    const texto = row.querySelector('.nota-row-text').value;
-    const minutos = Math.max(0, parseInt(row.querySelector('.nota-row-time').value,10)||0);
-    editarNota(id, texto, minutos);
-  }
-  else if(action==='del-nota') excluirNota(id);
-  else if(action==='abrir-evento') abrirEventoForm(id);
-  else if(action==='cancelar-evento') cancelarEventoForm();
-  else if(action==='salvar-evento') salvarEvento();
-  else if(action==='del-evento') excluirEvento(id);
-  else if(action==='revisar'){ pendingReviewPrompt = id; renderTemas(); }
+  if(action==='revisar'){ pendingReviewPrompt = id; renderTemas(); }
   else if(action==='revisar-dificil') revisarComDificuldade(id, -1);
   else if(action==='revisar-normal') revisarComDificuldade(id, 1);
   else if(action==='revisar-facil') revisarComDificuldade(id, 2);
   else if(action==='del-tema') delTema(id);
 });
-document.getElementById('btnAddNota').addEventListener('click', adicionarNota);
+document.getElementById('btnSaveNote').addEventListener('click', salvarNota);
+document.getElementById('btnSaveQuestoes').addEventListener('click', salvarQuestoes);
+document.getElementById('btnConquista').addEventListener('click', toggleConquista);
 document.getElementById('btnAddTema').addEventListener('click', addTema);
 document.getElementById('novoTemaInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') addTema(); });
 
@@ -837,8 +700,8 @@ document.getElementById('btnResetAll').addEventListener('click', async ()=>{
   const status = document.getElementById('settingsStatus');
   status.textContent = 'Apagando...';
   try{
-    await fbPut('/diario', {notas:null, atividade:null, temas:null, tempos:null, eventos:null});
-    notas={}; atividade={}; temas={}; eventos={};
+    await fbPut('/diario', {notas:null, atividade:null, temas:null, questoes:null, tempo:null, conquistas:null});
+    notas={}; atividade={}; temas={}; questoes={}; tempo={}; conquistas={};
     status.className='modal-status ok'; status.textContent='Apagado.';
     renderAll();
   }catch(err){
@@ -879,13 +742,16 @@ function checkAndNotify(){
 /* ============ RENDER GERAL ============ */
 function renderAll(){
   renderChips();
-  renderCalendar();
+  renderHeatmap();
   renderTemas();
   const isToday = selectedDate === todayKey();
   document.getElementById('dayPanelTitle').textContent = isToday ? 'Hoje' : fmtDatePT(selectedDate);
   document.getElementById('dayPanelSub').textContent = selectedDate;
-  renderNotasDoDia();
-  renderEventoDoDia();
+  document.getElementById('dayNoteInput').value = notas[selectedDate] || '';
+  document.getElementById('tempoInput').value = tempo[selectedDate] || '';
+  document.getElementById('questoesInput').value = questoes[selectedDate] || '';
+  updateQuestoesSub();
+  updateConquistaBtn();
 }
 
 /* ============ AUTO-REFRESH ============ */
@@ -918,7 +784,7 @@ window.addEventListener('pageshow', (e)=>{ if(e.persisted) refreshFromBackend();
     let hasCache=false;
     try{
       const raw = localStorage.getItem('diario_cache');
-      if(raw){ const c=JSON.parse(raw); notas=c.notas||{}; atividade=c.atividade||{}; temas=c.temas||{}; eventos=c.eventos||{}; hasCache=true; }
+      if(raw){ const c=JSON.parse(raw); notas=c.notas||{}; atividade=c.atividade||{}; temas=c.temas||{}; questoes=c.questoes||{}; tempo=c.tempo||{}; conquistas=c.conquistas||{}; hasCache=true; }
     }catch(e){}
     connectTitle.textContent = 'Não consegui conectar 😕';
     connectMsg.innerHTML =
